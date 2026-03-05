@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // === Variables & DOM Elements ===
     const itemsList = document.getElementById('itemsList');
     const addItemBtn = document.getElementById('addItemBtn');
     const discountType = document.getElementById('discountType');
@@ -13,41 +12,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtn = document.getElementById('downloadBtn');
     const previewBtn = document.getElementById('previewBtn');
 
-    // Logo elements
     const logoInput = document.getElementById('logoInput');
     const logoPreview = document.getElementById('logoPreview');
     const placeholderIcon = document.getElementById('placeholderIcon');
-
-    // Currency elements
     const currencySelect = document.getElementById('currency');
     const currentCurrencyFlag = document.getElementById('currentCurrencyFlag');
 
-    // State object to hold values for calculations. Defaults are set to 0.
     let invoiceState = {
         items: [],
         discount: { type: 'percent', value: 0 },
-        vatRate: 0, // Initial VAT % is now 0
+        vatRate: 0,
         subtotal: 0,
         vatAmount: 0,
         total: 0,
-        currencySymbol: '$', // Default to USD first
-        logoDataUrl: null // Store image as data URL for PDF
+        currencySymbol: '$',
+        logoDataUrl: null
     };
 
-    // === Helper Functions ===
-
-    // Formats a number to currency with symbol
     function formatCurrency(amount) {
         return invoiceState.currencySymbol + amount.toFixed(2);
     }
 
-    // Parses a number from input safely
     function parseInputNumber(value) {
         let num = parseFloat(value);
         return isNaN(num) ? 0 : num;
     }
+    
+    // Formats dates from "2026-03-04" to "Mar 04, 2026"
+    function formatToPDFDate(dateString) {
+        if (!dateString) return '';
+        const options = { year: 'numeric', month: 'short', day: '2-digit' };
+        const d = new Date(dateString);
+        return isNaN(d) ? dateString : d.toLocaleDateString('en-US', options);
+    }
 
-    // Helper to get image width/height for PDF
     function getImageDimensions(url) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -57,8 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
             img.src = url;
         });
     }
-
-    // === Logo Management ===
 
     logoInput.addEventListener('change', function() {
         const file = this.files[0];
@@ -79,14 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // === Currency Management ===
-
     function updateCurrency() {
         const selectedOption = currencySelect.options[currencySelect.selectedIndex];
         currentCurrencyFlag.src = selectedOption.dataset.flag;
         invoiceState.currencySymbol = selectedOption.dataset.symbol;
 
-        // Update value option symbol for fixed discount
         if (discountType.value === 'value') {
             discountType.options[1].textContent = invoiceState.currencySymbol;
         }
@@ -95,14 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     currencySelect.addEventListener('change', updateCurrency);
-
-    // Initial update
     updateCurrency();
 
-    // === Core Logic: Calculations ===
-
     function updateCalculations() {
-        // 1. Calculate items total and individual amounts
         invoiceState.subtotal = 0;
         const itemRows = itemsList.querySelectorAll('.item-row');
 
@@ -119,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
             invoiceState.subtotal += amount;
         });
 
-        // 2. Calculate Discount
         invoiceState.discount.type = discountType.value;
         invoiceState.discount.value = parseInputNumber(discountValueInput.value);
 
@@ -131,15 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const discountedSubtotal = invoiceState.subtotal - discountAmount;
-
-        // 3. Calculate VAT
         invoiceState.vatRate = parseInputNumber(vatValueInput.value);
         invoiceState.vatAmount = (discountedSubtotal * (invoiceState.vatRate / 100));
-
-        // 4. Calculate Final Total
         invoiceState.total = discountedSubtotal + invoiceState.vatAmount;
 
-        // 5. Update UI
         updateUI();
     }
 
@@ -151,9 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
         balanceDueDisplay.textContent = formatCurrency(invoiceState.total);
     }
 
-    // === UI Interaction Functions ===
-
-    // Adds a new item row to the table
     function addItemRow() {
         const newRow = document.createElement('div');
         newRow.className = 'item-row';
@@ -165,11 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="remove-item-btn"><i class="fas fa-trash-alt"></i></button>
         `;
 
-        // Add event listeners to the new inputs for calculations
         newRow.querySelector('.item-qty').addEventListener('input', updateCalculations);
         newRow.querySelector('.item-rate').addEventListener('input', updateCalculations);
-
-        // Add event listener to the remove button
         newRow.querySelector('.remove-item-btn').addEventListener('click', function() {
             this.closest('.item-row').remove();
             updateCalculations();
@@ -179,161 +155,170 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCalculations();
     }
 
-    // === PDF Generation Logic (using pdfmake) ===
-
+    // Completely rewritten PDF function matching your requested style
     async function generatePDF(isDownload = true) {
-        const businessName = document.getElementById('businessName').value || 'YOUR COMPANY NAME';
-        const invoiceNumber = document.getElementById('invoiceNumber').value;
-        const invoiceDate = document.getElementById('invoiceDate').value;
-        const dueDate = document.getElementById('dueDate').value;
+        try {
+            const businessName = document.getElementById('businessName').value || '';
+            const invoiceNumber = document.getElementById('invoiceNumber').value || '1';
+            const invoiceDateRaw = document.getElementById('invoiceDate').value;
+            const dueDateRaw = document.getElementById('dueDate').value;
+            const paymentTerms = document.getElementById('paymentTerms').value || 'Net 30';
+            const billTo = document.getElementById('billTo').value || '';
+            const billToAddress = document.getElementById('billToAddress').value || '';
+            
+            // Safely fetch Ship To, since it previously crashed here
+            const shipToElem = document.getElementById('shipTo');
+            const shipTo = shipToElem ? shipToElem.value : '';
 
-        // Definition structure for content
-        let contentDefinition = [];
+            let contentDefinition = [];
 
-        // 1. Logo (if present) and Company Name
-        if (invoiceState.logoDataUrl) {
-            // Calculate dimensions for good scaling
-            const dimensions = await getImageDimensions(invoiceState.logoDataUrl);
-            const scale = 50 / dimensions.height; // scale down to height of 50
-            const finalWidth = dimensions.width * scale;
+            // 1. Header (Logo/From and Invoice info)
+            let headerColumns = [
+                {
+                    width: '*',
+                    stack: [
+                        { text: 'FROM', style: 'sectionLabel' },
+                        { text: businessName, style: 'companyName' }
+                    ]
+                },
+                {
+                    width: 'auto',
+                    stack: [
+                        { text: 'Invoice', style: 'mainTitle', alignment: 'right' },
+                        { text: 'INV-' + invoiceNumber, style: 'subTitle', alignment: 'right' }
+                    ]
+                }
+            ];
 
+            if (invoiceState.logoDataUrl) {
+                const dimensions = await getImageDimensions(invoiceState.logoDataUrl);
+                const scale = 50 / dimensions.height;
+                const finalWidth = dimensions.width * scale;
+                headerColumns[0].stack.unshift({ image: invoiceState.logoDataUrl, width: finalWidth, height: 50, margin: [0, 0, 0, 10] });
+            }
+
+            contentDefinition.push({ columns: headerColumns, margin: [0, 0, 0, 30] });
+
+            // 2. Billing details row
             contentDefinition.push({
-                columns: [
-                    { image: invoiceState.logoDataUrl, width: finalWidth, height: 50 },
-                    { text: businessName, style: 'header', margin: [20, 10, 0, 0] }
-                ],
-                margin: [0, 0, 0, 20]
-            });
-        } else {
-            contentDefinition.push({ text: businessName, style: 'header' });
-        }
-
-        // 2. Invoice Details Header
-        contentDefinition.push(
-            { text: 'Invoice No: #' + invoiceNumber, style: 'subHeader' },
-            { text: 'Invoice Date: ' + invoiceDate, style: 'subHeader' },
-            { text: 'Due Date: ' + dueDate, style: 'subHeader' },
-            '\n'
-        );
-
-        // 3. Billing columns
-        contentDefinition.push(
-            {
                 columns: [
                     {
                         width: '50%',
-                        text: [
-                            {text: 'Bill To (Client):\n', style: 'tableHeader'},
-                            document.getElementById('billTo').value || 'Client Name\n',
-                            document.getElementById('billToAddress').value || 'Client Address'
+                        stack: [
+                            { text: 'BILL TO (CLIENT)', style: 'sectionLabel' },
+                            { text: billTo, bold: true, margin: [0, 5, 0, 0] },
+                            { text: billToAddress }
                         ]
                     },
                     {
                         width: '50%',
-                        text: [
-                            {text: 'Ship To:\n', style: 'tableHeader'},
-                            document.getElementById('shipTo').value || 'N/A'
+                        stack: [
+                            { text: 'SHIP TO', style: 'sectionLabel' },
+                            { text: shipTo, margin: [0, 5, 0, 0] }
                         ]
                     }
+                ],
+                margin: [0, 0, 0, 30]
+            });
+
+            // 3. Dates and Terms row
+            contentDefinition.push({
+                columns: [
+                    { width: '*', stack: [{ text: 'PAYMENT TERMS (OPTIONAL)', style: 'sectionLabel' }, { text: paymentTerms, margin: [0, 5, 0, 0] }] },
+                    { width: '*', stack: [{ text: 'INVOICE DATE', style: 'sectionLabel' }, { text: formatToPDFDate(invoiceDateRaw), margin: [0, 5, 0, 0] }] },
+                    { width: '*', stack: [{ text: 'DUE DATE', style: 'sectionLabel' }, { text: formatToPDFDate(dueDateRaw), margin: [0, 5, 0, 0] }] }
+                ],
+                margin: [0, 0, 0, 30]
+            });
+
+            // 4. Items table
+            let tableBody = [
+                [
+                    { text: 'DESCRIPTION', style: 'tableHeader' },
+                    { text: 'QTY', style: 'tableHeader', alignment: 'right' },
+                    { text: 'RATE', style: 'tableHeader', alignment: 'right' },
+                    { text: 'AMOUNT', style: 'tableHeader', alignment: 'right' }
                 ]
-            },
-            '\n'
-        );
+            ];
 
-        // 4. Item table headers
-        let tableBody = [
-            [
-                { text: 'Description', style: 'tableHeader' },
-                { text: 'Qty', style: 'tableHeader', alignment: 'right' },
-                { text: 'Rate', style: 'tableHeader', alignment: 'right' },
-                { text: 'Amount', style: 'tableHeader', alignment: 'right' }
-            ]
-        ];
+            const itemRows = itemsList.querySelectorAll('.item-row');
+            itemRows.forEach(row => {
+                const desc = row.querySelector('.item-description').value;
+                const qty = row.querySelector('.item-qty').value;
+                const rate = formatCurrency(parseInputNumber(row.querySelector('.item-rate').value));
+                const amount = row.querySelector('.item-amount').textContent;
 
-        // 5. Populate table body from item rows
-        const itemRows = itemsList.querySelectorAll('.item-row');
-        itemRows.forEach(row => {
-            const desc = row.querySelector('.item-description').value;
-            const qty = row.querySelector('.item-qty').value;
-            const rate = formatCurrency(parseInputNumber(row.querySelector('.item-rate').value));
-            const amount = row.querySelector('.item-amount').textContent;
+                tableBody.push([
+                    { text: desc, margin: [0, 5, 0, 5] }, 
+                    { text: qty, alignment: 'right', margin: [0, 5, 0, 5] }, 
+                    { text: rate, alignment: 'right', margin: [0, 5, 0, 5] }, 
+                    { text: amount, alignment: 'right', margin: [0, 5, 0, 5] }
+                ]);
+            });
 
-            tableBody.push([desc, {text:qty, alignment:'right'}, {text:rate, alignment:'right'}, {text:amount, alignment:'right'}]);
-        });
-
-        // Add table definition
-        contentDefinition.push(
-            {
+            contentDefinition.push({
                 table: {
                     headerRows: 1,
-                    widths: ['*', 50, 80, 80],
+                    widths: ['*', 'auto', 'auto', 'auto'],
                     body: tableBody
-                }
-            },
-            '\n\n'
-        );
+                },
+                layout: 'lightHorizontalLines', // Gives standard invoice lines underneath
+                margin: [0, 0, 0, 20]
+            });
 
-        // 6. Summary and Notes
-        contentDefinition.push(
-            {
+            // 5. Summary Section (Right Aligned)
+            contentDefinition.push({
                 columns: [
-                    { width: '60%', text: ['Notes:\n', document.getElementById('notes').value] },
+                    { width: '*', text: '' }, // empty left side
                     {
                         width: '40%',
                         table: {
                             widths: ['*', 'auto'],
                             body: [
-                                ['Subtotal:', {text: formatCurrency(invoiceState.subtotal), alignment:'right'}],
-                                [`VAT (${invoiceState.vatRate}%):`, {text: formatCurrency(invoiceState.vatAmount), alignment:'right'}],
-                                [{ text: 'Total:', bold: true }, { text: formatCurrency(invoiceState.total), bold: true, alignment:'right' }]
+                                ['Subtotal', { text: formatCurrency(invoiceState.subtotal), alignment: 'right' }],
+                                [{ text: 'Tax\nVAT (' + invoiceState.vatRate + '%)', color: '#555' }, { text: formatCurrency(invoiceState.vatAmount), alignment: 'right' }],
+                                [{ text: 'Total', bold: true }, { text: formatCurrency(invoiceState.total), bold: true, alignment: 'right' }],
+                                [{ text: 'Balance Due', bold: true, margin: [0, 10, 0, 0] }, { text: formatCurrency(invoiceState.total), bold: true, alignment: 'right', margin: [0, 10, 0, 0] }]
                             ]
                         },
                         layout: 'noBorders'
                     }
-                ]
-            },
-            '\n'
-        );
+                ],
+                margin: [0, 0, 0, 30]
+            });
 
-        // 7. Terms & Conditions
-        contentDefinition.push(
-            { text: 'Terms & Conditions:', style: 'tableHeader' },
-            document.getElementById('terms').value
-        );
+            const docDefinition = {
+                content: contentDefinition,
+                styles: {
+                    mainTitle: { fontSize: 28, color: '#333333' },
+                    subTitle: { fontSize: 12, color: '#666666', margin: [0, 5, 0, 0] },
+                    companyName: { fontSize: 14, bold: true, color: '#333333', margin: [0, 5, 0, 0] },
+                    sectionLabel: { fontSize: 10, bold: true, color: '#888888' },
+                    tableHeader: { bold: true, fontSize: 11, color: '#555555', fillColor: '#f8f9fa', margin: [0, 5, 0, 5] }
+                },
+                defaultStyle: { fontSize: 11, color: '#222222' }
+            };
 
-        // Definining the whole doc
-        const docDefinition = {
-            content: contentDefinition,
-            styles: {
-                header: { fontSize: 22, bold: true, margin: [0, 0, 0, 10] },
-                subHeader: { fontSize: 12, color: 'gray' },
-                tableHeader: { bold: true, fontSize: 13, color: 'black', margin: [0, 0, 0, 5] }
-            },
-            defaultStyle: { fontSize: 11, color: '#333' }
-        };
-
-        // Generate and perform action (download or open)
-        if (isDownload) {
-            pdfMake.createPdf(docDefinition).download('Invoice_#' + invoiceNumber + '.pdf');
-        } else {
-            pdfMake.createPdf(docDefinition).open();
+            if (isDownload) {
+                pdfMake.createPdf(docDefinition).download('INV-' + invoiceNumber + '.pdf');
+            } else {
+                pdfMake.createPdf(docDefinition).open();
+            }
+            
+        } catch (error) {
+            console.error("PDF Generation Error: ", error);
+            alert("An error occurred. Check the console for details.");
         }
     }
 
-    // === Event Listeners ===
-
-    // Initial calculation on load (after currency)
     updateCalculations();
 
-    // Listen for changes in inputs to trigger recalculation
     document.querySelectorAll('.item-qty, .item-rate, #discountValue, #vatValue').forEach(input => {
         input.addEventListener('input', updateCalculations);
     });
 
-    // Discount type dropdown change
     discountType.addEventListener('change', function() {
         invoiceState.discount.type = this.value;
-        // Update symbol label
         if (this.value === 'percent') {
             this.options[1].textContent = '%';
         } else {
@@ -342,10 +327,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCalculations();
     });
 
-    // Add Item button
     addItemBtn.addEventListener('click', addItemRow);
 
-    // Initial Remove buttons on page load
     itemsList.querySelectorAll('.remove-item-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             this.closest('.item-row').remove();
@@ -353,10 +336,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Download button
-    downloadBtn.addEventListener('click', () => generatePDF(true));
-
-    // Preview button
-    previewBtn.addEventListener('click', () => generatePDF(false));
+    // Make sure we stop default form submissions and call the updated function safely
+    downloadBtn.addEventListener('click', (e) => { e.preventDefault(); generatePDF(true); });
+    previewBtn.addEventListener('click', (e) => { e.preventDefault(); generatePDF(false); });
 
 });
