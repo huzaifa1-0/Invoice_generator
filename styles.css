@@ -12,6 +12,11 @@ body {
     line-height: 1.6;
 }
 
+/* Common Classes */
+.hidden {
+    display: none !important;
+}
+
 /* Base styling for buttons and forms */
 input, textarea, select {
     background-color: #212529; /* Input background */
@@ -50,6 +55,7 @@ label {
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: background-color 0.2s;
 }
 
 .btn-primary-light {
@@ -179,7 +185,7 @@ label {
 .add-logo-btn {
     width: 100px;
     height: 100px;
-    border: 1px solid #343a40;
+    border: 1px dashed #343a40; /* Changed to dashed to indicate interaction */
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -188,11 +194,36 @@ label {
     color: #adb5bd;
     cursor: pointer;
     font-size: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, background-color 0.2s;
 }
 
-.add-logo-btn i {
+.add-logo-btn:hover {
+    border-color: #adb5bd;
+    background-color: rgba(173, 181, 189, 0.05);
+}
+
+.add-logo-btn .placeholder-icon {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.add-logo-btn .placeholder-icon i {
     font-size: 24px;
     margin-bottom: 10px;
+}
+
+.logo-preview-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .form-group-flex {
@@ -202,7 +233,8 @@ label {
 /* Details grid */
 .invoice-details-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 100px;
+    /* FIX: Increased last column width to prevent overflow for large invoice numbers */
+    grid-template-columns: 1fr 1fr 130px;
     gap: 15px;
     margin-bottom: 30px;
 }
@@ -230,6 +262,11 @@ label {
     color: #fff;
     font-weight: bold;
     letter-spacing: 1px;
+}
+
+.invoice-num-group input {
+    text-align: right;
+    width: 100%;
 }
 
 /* Billing Grid */
@@ -414,10 +451,12 @@ label {
     justify-content: space-between;
     margin-bottom: 10px;
     font-size: 14px;
+    text-align: right;
 }
 
 .total-row .label {
     color: #adb5bd;
+    text-align: left;
 }
 
 .total-row .value {
@@ -443,10 +482,12 @@ label {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 30px;
+    text-align: right;
 }
 
 .balance-due-section .label {
     color: #1abc9c; /* Green highlight color */
+    text-align: left;
 }
 
 .balance-due-section .value {
