@@ -19,7 +19,15 @@
                 <a href="#" class="nav-link active">
                     <i class="far fa-plus-square"></i> Invoice Generator
                 </a>
+                <a href="#" class="nav-link"><i class="far fa-file"></i> Templates</a>
+                <a href="#" class="nav-link"><i class="far fa-history"></i> History</a>
             </nav>
+        </div>
+        <div class="header-right">
+            <span class="header-icon"><i class="far fa-moon"></i></span>
+            <span class="header-icon"><i class="fas fa-globe"></i> English</span>
+            <a href="#" class="nav-link">Sign In</a>
+            <button class="btn btn-primary-light">Get Started</button>
         </div>
     </header>
 
@@ -36,10 +44,15 @@
             <div class="form-cols">
                 <div class="form-col-left">
                     <div class="logo-and-business">
-                        <div class="add-logo-btn">
-                            <i class="fas fa-plus"></i>
-                            Change logo
-                        </div>
+                        <label for="logoInput" class="add-logo-btn" id="logoLabel">
+                            <img src="" alt="Invoice Logo" id="logoPreview" class="logo-preview-img hidden">
+                            <div class="placeholder-icon" id="placeholderIcon">
+                                <i class="fas fa-plus"></i>
+                                <span>Add logo</span>
+                            </div>
+                        </label>
+                        <input type="file" id="logoInput" accept="image/*" style="display:none;">
+
                         <div class="form-group-flex">
                             <div class="input-container">
                                 <label for="businessName">Business Name *</label>
@@ -58,10 +71,11 @@
                         <div class="form-group currency-group">
                             <label for="currency">Currency</label>
                             <div class="currency-selector">
-                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USD Flag" class="flag-icon">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USD Flag" class="flag-icon" id="currentCurrencyFlag">
                                 <select id="currency">
-                                    <option value="USD">USD - US Dollar ($)</option>
-                                    <option value="EUR">EUR - Euro (€)</option>
+                                    <option value="USD" selected data-symbol="$" data-flag="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg">USD - US Dollar ($)</option>
+                                    <option value="EUR" data-symbol="€" data-flag="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg">EUR - Euro (€)</option>
+                                    <option value="PKR" data-symbol="Rs" data-flag="https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Pakistan.svg">PKR - Pakistani Rupee (Rs)</option>
                                 </select>
                             </div>
                         </div>
@@ -116,9 +130,9 @@
                 <div id="itemsList">
                     <div class="item-row">
                         <input type="text" class="item-description col-desc" value="Professional services" placeholder="Description">
-                        <input type="number" class="item-qty col-qty" value="1">
-                        <input type="number" class="item-rate col-rate" value="99">
-                        <span class="item-amount col-amount">$99.00</span>
+                        <input type="number" class="item-qty col-qty" value="0">
+                        <input type="number" class="item-rate col-rate" value="0">
+                        <span class="item-amount col-amount">$0.00</span>
                         <button class="remove-item-btn"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -146,8 +160,7 @@
                             <label>Discount</label>
                             <select id="discountType">
                                 <option value="percent">%</option>
-                                <option value="value">$</option>
-                            </select>
+                                <option value="value">Rs</option> </select>
                             <input type="number" id="discountValue" value="0">
                         </div>
                         <a href="#" class="summary-action-link">Add Discount</a>
@@ -155,7 +168,7 @@
                         <div class="summary-row-input">
                             <label>VAT</label>
                             <div class="vat-input-group">
-                                <input type="number" id="vatValue" value="10">
+                                <input type="number" id="vatValue" value="0">
                                 <span class="percent-symbol">%</span>
                             </div>
                         </div>
@@ -172,7 +185,7 @@
                             <span class="value" id="subtotalDisplay">$0.00</span>
                         </div>
                         <div class="total-row">
-                            <span class="label" id="vatLabel">VAT (10%)</span>
+                            <span class="label" id="vatLabel">VAT (0%)</span>
                             <span class="value" id="vatAmountDisplay">$0.00</span>
                         </div>
                         <div class="total-row total-final">
