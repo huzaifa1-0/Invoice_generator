@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyOnlineInvoices - Static Invoice Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+</head>
+<body class="dark-theme">
+    <header class="main-header">
+        <div class="header-left">
+            <span class="logo">
+                <i class="far fa-file-alt"></i> MyOnlineInvoices
+            </span>
+            <nav class="main-nav">
+                <a href="#" class="nav-link active">
+                    <i class="far fa-plus-square"></i> Invoice Generator
+                </a>
+                <a href="#" class="nav-link"><i class="far fa-file"></i> Templates</a>
+                <a href="#" class="nav-link"><i class="far fa-history"></i> History</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <span class="header-icon"><i class="far fa-moon"></i></span>
+            <span class="header-icon"><i class="fas fa-globe"></i> English</span>
+            <a href="#" class="nav-link">Sign In</a>
+            <button class="btn btn-primary-light">Get Started</button>
+        </div>
+    </header>
+
+    <main class="invoice-container">
+        <section class="invoice-form">
+            <div class="invoice-top-controls">
+                <i class="fas fa-arrow-left back-arrow"></i>
+                <div class="title-area">
+                    <h1>Free Invoice Generator</h1>
+                    <p>Create with a professional invoice template</p>
+                </div>
+            </div>
+
+            <div class="form-cols">
+                <div class="form-col-left">
+                    <div class="logo-and-business">
+                        <div class="add-logo-btn">
+                            <i class="fas fa-plus"></i>
+                            Change logo
+                        </div>
+                        <div class="form-group-flex">
+                            <div class="input-container">
+                                <label for="businessName">Business Name *</label>
+                                <input type="text" id="businessName" placeholder="Your Company">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="invoice-details-grid">
+                        <div class="form-group">
+                            <label for="template">Template</label>
+                            <select id="template">
+                                <option value="classic">Classic</option>
+                            </select>
+                        </div>
+                        <div class="form-group currency-group">
+                            <label for="currency">Currency</label>
+                            <div class="currency-selector">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USD Flag" class="flag-icon">
+                                <select id="currency">
+                                    <option value="USD">USD - US Dollar ($)</option>
+                                    <option value="EUR">EUR - Euro (€)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group invoice-num-group">
+                            <label>INVOICE</label>
+                            <input type="text" value="1" id="invoiceNumber">
+                        </div>
+                    </div>
+
+                    <div class="billing-grid">
+                        <div class="form-group">
+                            <label for="billTo">Bill To (Client)</label>
+                            <input type="text" id="billTo" placeholder="Client Name">
+                            <textarea id="billToAddress" placeholder="Client address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipTo">Ship To</label>
+                            <textarea id="shipTo" placeholder="Client address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="dates-grid">
+                        <div class="form-group">
+                            <label for="invoiceDate">Invoice Date *</label>
+                            <input type="date" id="invoiceDate" value="2026-03-05">
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="date" id="dueDate" value="2026-04-04">
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentTerms">Payment Terms (optional)</label>
+                            <input type="text" id="paymentTerms" placeholder="Net 30">
+                        </div>
+                        <div class="form-group">
+                            <label for="poNumber">PO Number</label>
+                            <input type="text" id="poNumber" placeholder="Optional">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="items-services-section">
+                <h2>Items / Services</h2>
+                <div class="items-header">
+                    <span class="col-desc">Description</span>
+                    <span class="col-qty">Qty</span>
+                    <span class="col-rate">Rate</span>
+                    <span class="col-amount">Amount</span>
+                    <span class="col-actions"></span>
+                </div>
+                <div id="itemsList">
+                    <div class="item-row">
+                        <input type="text" class="item-description col-desc" value="Professional services" placeholder="Description">
+                        <input type="number" class="item-qty col-qty" value="1">
+                        <input type="number" class="item-rate col-rate" value="99">
+                        <span class="item-amount col-amount">$99.00</span>
+                        <button class="remove-item-btn"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <button class="btn btn-primary-light" id="addItemBtn">
+                    <i class="fas fa-plus"></i> Add item
+                </button>
+            </section>
+
+            <section class="notes-section">
+                <div class="notes-container">
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" placeholder="Additional notes..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="terms">Terms & Conditions</label>
+                        <textarea id="terms">Payment is due within 30 days of invoice date.</textarea>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-row-input">
+                            <label>Discount</label>
+                            <select id="discountType">
+                                <option value="percent">%</option>
+                                <option value="value">$</option>
+                            </select>
+                            <input type="number" id="discountValue" value="0">
+                        </div>
+                        <a href="#" class="summary-action-link">Add Discount</a>
+
+                        <div class="summary-row-input">
+                            <label>VAT</label>
+                            <div class="vat-input-group">
+                                <input type="number" id="vatValue" value="10">
+                                <span class="percent-symbol">%</span>
+                            </div>
+                        </div>
+                        <a href="#" class="summary-action-link">Add Tax</a>
+
+                        <div class="shipping-section-toggle">
+                            <i class="fas fa-chevron-right"></i> Shipping & amount paid
+                        </div>
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-row">
+                            <span class="label">Subtotal</span>
+                            <span class="value" id="subtotalDisplay">$99.00</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="label" id="vatLabel">VAT (10%)</span>
+                            <span class="value" id="vatAmountDisplay">$9.90</span>
+                        </div>
+                        <div class="total-row total-final">
+                            <span class="label">Total</span>
+                            <span class="value" id="totalDisplay">$108.90</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-due-section">
+                        <span class="label">Balance Due</span>
+                        <span class="value" id="balanceDueDisplay">$108.90</span>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary-outline" id="previewBtn">
+                            <i class="far fa-eye"></i> Preview
+                        </div>
+                        <button class="btn btn-primary" id="downloadBtn">
+                            <i class="far fa-file-pdf"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+    </main>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

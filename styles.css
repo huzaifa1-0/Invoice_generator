@@ -1,0 +1,461 @@
+/* General resets and fonts */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #0b0c0f; /* Outer page background */
+    color: #c9ccd0; /* Light gray text */
+    line-height: 1.6;
+}
+
+/* Base styling for buttons and forms */
+input, textarea, select {
+    background-color: #212529; /* Input background */
+    border: 1px solid #343a40; /* Input border */
+    color: #c9ccd0;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #17a2b8; /* Cyan accent on focus */
+}
+
+textarea {
+    resize: vertical;
+    width: 100%;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    color: #adb5bd;
+    margin-bottom: 4px;
+}
+
+/* Button variants */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary-light {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+}
+
+.btn-primary-light:hover {
+    background-color: rgba(23, 162, 184, 0.2);
+}
+
+.btn-secondary-outline {
+    background-color: transparent;
+    border: 1px solid #adb5bd;
+    color: #adb5bd;
+}
+
+.btn-secondary-outline:hover {
+    background-color: #adb5bd;
+    color: #0b0c0f;
+}
+
+.btn-primary {
+    background-color: #1abc9c; /* The distinct green for download */
+    color: #0b0c0f;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #16a085;
+}
+
+/* Header */
+.main-header {
+    background-color: #000;
+    border-bottom: 1px solid #1c1f23;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-weight: bold;
+    color: #fff;
+    font-size: 18px;
+}
+
+.logo i {
+    margin-right: 5px;
+}
+
+.main-nav .nav-link {
+    text-decoration: none;
+    color: #adb5bd;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+}
+
+.main-nav .nav-link.active {
+    color: #fff;
+    border-color: #1abc9c;
+}
+
+.header-icon {
+    color: #adb5bd;
+    cursor: pointer;
+}
+
+/* Main content and forms */
+.invoice-container {
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.invoice-form {
+    background-color: #111418; /* Main form area background */
+    padding: 40px;
+    border-radius: 8px;
+    border: 1px solid #1c1f23;
+}
+
+.invoice-top-controls {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.back-arrow {
+    color: #adb5bd;
+    font-size: 18px;
+    cursor: pointer;
+    padding-top: 5px;
+}
+
+.title-area h1 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.title-area p {
+    color: #adb5bd;
+    font-size: 14px;
+}
+
+/* Logo and business section */
+.logo-and-business {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 30px;
+}
+
+.add-logo-btn {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #343a40;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #adb5bd;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.add-logo-btn i {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.form-group-flex {
+    flex-grow: 1;
+}
+
+/* Details grid */
+.invoice-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 100px;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.currency-group .currency-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #343a40;
+    border-radius: 4px;
+    background-color: #212529;
+    padding-left: 10px;
+}
+
+.currency-group select {
+    border: none;
+    flex-grow: 1;
+}
+
+.currency-group .flag-icon {
+    width: 20px;
+    height: auto;
+}
+
+.invoice-num-group label {
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Billing Grid */
+.billing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.billing-grid .form-group textarea {
+    margin-top: 10px;
+    height: 100px;
+}
+
+/* Dates Grid */
+.dates-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+/* Items/Services section */
+.items-services-section {
+    margin-bottom: 50px;
+}
+
+.items-services-section h2 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.items-header {
+    display: grid;
+    grid-template-columns: 1fr 100px 120px 120px 40px;
+    gap: 15px;
+    color: #adb5bd;
+    font-size: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1c1f23;
+    margin-bottom: 15px;
+}
+
+.items-header span {
+    font-weight: bold;
+}
+
+.item-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 120px 120px 40px;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.col-qty, .col-rate, .col-amount {
+    text-align: right;
+}
+
+.item-row .col-qty, .item-row .col-rate {
+    width: 100%;
+}
+
+.item-amount {
+    color: #fff;
+    font-weight: bold;
+}
+
+.remove-item-btn {
+    background: transparent;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 16px;
+    visibility: hidden;
+}
+
+.item-row:hover .remove-item-btn {
+    visibility: visible;
+}
+
+/* Notes and Summary section */
+.notes-section {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.notes-container .form-group {
+    margin-bottom: 20px;
+}
+
+.notes-container textarea {
+    height: 120px;
+}
+
+/* Summary Box */
+.summary-section {
+    background-color: transparent;
+    border: 1px solid #1c1f23;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.summary-section h3 {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.summary-row-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-row-input label {
+    min-width: 60px;
+    margin-bottom: 0;
+}
+
+.summary-row-input select {
+    width: 60px;
+}
+
+.summary-row-input input {
+    width: 60px;
+    text-align: right;
+}
+
+.vat-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.percent-symbol {
+    color: #adb5bd;
+}
+
+.summary-action-link {
+    color: #17a2b8;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.summary-action-link:hover {
+    text-decoration: underline;
+}
+
+.shipping-section-toggle {
+    grid-column: 1 / -1;
+    color: #adb5bd;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-totals {
+    border-top: 1px solid #1c1f23;
+    padding-top: 20px;
+    margin-bottom: 25px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.total-row .label {
+    color: #adb5bd;
+}
+
+.total-row .value {
+    color: #fff;
+    font-weight: 600;
+}
+
+.total-row.total-final {
+    font-size: 16px;
+    border-top: 1px solid #1c1f23;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.total-row.total-final .value {
+    font-size: 18px;
+}
+
+/* Balance Due section */
+.balance-due-section {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.balance-due-section .label {
+    color: #1abc9c; /* Green highlight color */
+}
+
+.balance-due-section .value {
+    color: #fff;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
