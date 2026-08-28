@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const currentCurrencyFlag = document.getElementById('currentCurrencyFlag');
 
   const toast = document.getElementById('toast');
+  const resetModal = document.getElementById('resetModal');
+  const confirmResetBtn = document.getElementById('confirmResetBtn');
+  const cancelResetBtn = document.getElementById('cancelResetBtn');
 
   const FORM_FIELD_IDS = [
     'businessName', 'businessEmail', 'businessPhone', 'businessAddress',
@@ -585,8 +588,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function resetForm() {
-    if (!confirm('Start a new invoice? This clears the current draft.')) return;
+  function showResetModal() {
+    resetModal.classList.remove('hidden');
+  }
+
+  function hideResetModal() {
+    resetModal.classList.add('hidden');
+  }
+
+  cancelResetBtn.addEventListener('click', hideResetModal);
+
+  confirmResetBtn.addEventListener('click', () => {
+    hideResetModal();
+    performReset();
+  });
+
+  function performReset() {
     localStorage.removeItem(STORAGE_KEY);
     FORM_FIELD_IDS.forEach(id => {
       const el = document.getElementById(id);
@@ -633,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function () {
   downloadBtn.addEventListener('click', (e) => { e.preventDefault(); generatePDF(true); });
   previewBtn.addEventListener('click', (e) => { e.preventDefault(); generatePDF(false); });
   printBtn.addEventListener('click', (e) => { e.preventDefault(); window.print(); });
-  resetBtn.addEventListener('click', (e) => { e.preventDefault(); resetForm(); });
+  resetBtn.addEventListener('click', (e) => { e.preventDefault(); showResetModal(); });
 
   /* ============================================================
      Init

@@ -170,13 +170,6 @@
             <span class="col-actions"></span>
           </div>
           <div id="itemsList">
-            <div class="item-row">
-              <input type="text" class="item-description col-desc" value="Professional dental services" placeholder="Description">
-              <input type="number" class="item-qty col-qty" value="1" min="0">
-              <input type="number" class="item-rate col-rate" value="0" min="0" step="0.01">
-              <span class="item-amount col-amount">$0.00</span>
-              <button class="remove-item-btn" title="Remove item"><i class="fas fa-trash-alt"></i></button>
-            </div>
           </div>
           <button class="btn btn-primary-light" id="addItemBtn">
             <i class="fas fa-plus"></i> Add item
@@ -333,6 +326,21 @@
 
   </div>
 </main>
+
+<div class="modal-overlay hidden" id="resetModal">
+  <div class="modal-content card">
+    <div class="modal-header">
+      <h3><i class="fas fa-triangle-exclamation" style="color: var(--error);"></i> Reset Invoice</h3>
+    </div>
+    <div class="modal-body">
+      <p>Start a new invoice? This will clear the current draft.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancelResetBtn">Cancel</button>
+      <button class="btn btn-primary" id="confirmResetBtn" style="background-color: var(--error); box-shadow: none;">Reset</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
