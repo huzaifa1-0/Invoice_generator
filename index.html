@@ -1,206 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyOnlineInvoices - Static Invoice Generator</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
-<body class="dark-theme">
-    <header class="main-header">
-        <div class="header-left">
-            <span class="logo">
-                <i class="far fa-file-alt"></i> MyOnlineInvoices
-            </span>
-            <nav class="main-nav">
-                <a href="#" class="nav-link active">
-                    <i class="far fa-plus-square"></i> Invoice Generator
-                </a>
-            </nav>
+<body>
+
+<header class="main-header">
+  <div class="header-left">
+    <span class="logo"><span class="logo-mark"><i class="far fa-file-alt"></i></span>Invoice Generator</span>
+  </div>
+  <div class="header-right">
+    <span class="draft-status" id="draftStatus"><i class="fas fa-circle-check"></i> Draft saved</span>
+    <button class="icon-btn" id="resetBtn" title="Start a new invoice"><i class="fas fa-rotate-left"></i></button>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-title-row">
+    <div>
+      <h1>Create Invoice</h1>
+      <p>Fill in the details on the left — your invoice updates live on the right.</p>
+    </div>
+    <div class="page-title-actions">
+      <button class="btn btn-outline" id="printBtn"><i class="fas fa-print"></i> Print</button>
+      <button class="btn btn-outline" id="previewBtn"><i class="far fa-eye"></i> Preview PDF</button>
+      <button class="btn btn-primary" id="downloadBtn"><i class="far fa-file-pdf"></i> Download PDF</button>
+    </div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- ============ LEFT: FORM ============ -->
+    <section class="form-column">
+
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-building card-header-icon"></i> Your Business</h2>
         </div>
-    </header>
+        <div class="card-body">
+          <div class="logo-and-business">
+            <label for="logoInput" class="add-logo-btn" id="logoLabel">
+              <img src="" alt="Business Logo" id="logoPreview" class="logo-preview-img hidden">
+              <div class="placeholder-icon" id="placeholderIcon">
+                <i class="fas fa-plus"></i>
+                <span>Add logo</span>
+              </div>
+            </label>
+            <input type="file" id="logoInput" accept="image/*" style="display:none;">
 
-    <main class="invoice-container">
-        <section class="invoice-form">
-            <div class="invoice-top-controls">
-                <i class="fas fa-arrow-left back-arrow"></i>
-                <div class="title-area">
-                    <h1>Free Invoice Generator</h1>
-                    <p>Create with a professional invoice template</p>
-                </div>
+            <div class="stacked-fields">
+              <div class="field">
+                <label for="businessName">Business / Practice name <span class="req">*</span></label>
+                <input type="text" id="businessName" placeholder="e.g. Bright Smile Dental Care">
+              </div>
+              <div class="field">
+                <label for="businessEmail">Email</label>
+                <input type="email" id="businessEmail" placeholder="billing@yourpractice.com">
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid two-col">
+            <div class="field">
+              <label for="businessPhone">Phone</label>
+              <input type="text" id="businessPhone" placeholder="(555) 555-5555">
+            </div>
+            <div class="field">
+              <label for="businessAddress">Address</label>
+              <input type="text" id="businessAddress" placeholder="123 Main St, City, State">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-file-invoice card-header-icon"></i> Invoice Details</h2>
+        </div>
+        <div class="card-body">
+          <div class="field-grid three-col">
+            <div class="field">
+              <label for="template">Template</label>
+              <select id="template">
+                <option value="classic">Classic</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="currency">Currency</label>
+              <div class="currency-selector">
+                <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="" class="flag-icon" id="currentCurrencyFlag">
+                <select id="currency">
+                  <option value="USD" selected data-symbol="$" data-flag="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg">USD ($)</option>
+                  <option value="EUR" data-symbol="&#8364;" data-flag="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg">EUR (&#8364;)</option>
+                  <option value="GBP" data-symbol="&#163;" data-flag="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg">GBP (&#163;)</option>
+                  <option value="PKR" data-symbol="Rs" data-flag="https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Pakistan.svg">PKR (Rs)</option>
+                  <option value="INR" data-symbol="&#8377;" data-flag="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg">INR (&#8377;)</option>
+                  <option value="AED" data-symbol="AED" data-flag="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg">AED</option>
+                </select>
+              </div>
+            </div>
+            <div class="field invoice-num-field">
+              <label>Invoice #</label>
+              <input type="text" value="1001" id="invoiceNumber">
+            </div>
+          </div>
+
+          <div class="field-grid four-col">
+            <div class="field">
+              <label for="invoiceDate">Invoice date <span class="req">*</span></label>
+              <input type="date" id="invoiceDate">
+            </div>
+            <div class="field">
+              <label for="dueDate">Due date</label>
+              <input type="date" id="dueDate">
+            </div>
+            <div class="field">
+              <label for="paymentTerms">Payment terms</label>
+              <input type="text" id="paymentTerms" placeholder="Net 30">
+            </div>
+            <div class="field">
+              <label for="poNumber">PO number</label>
+              <input type="text" id="poNumber" placeholder="Optional">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-user card-header-icon"></i> Bill To (Patient / Client)</h2>
+        </div>
+        <div class="card-body">
+          <div class="field-grid two-col">
+            <div class="field">
+              <label for="billTo">Client name <span class="req">*</span></label>
+              <input type="text" id="billTo" placeholder="Client name">
+            </div>
+            <div class="field">
+              <label for="billToEmail">Client email</label>
+              <input type="email" id="billToEmail" placeholder="client@email.com">
+            </div>
+          </div>
+          <div class="field">
+            <label for="billToAddress">Client address</label>
+            <textarea id="billToAddress" placeholder="Client address"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header card-header-row">
+          <h2><i class="fas fa-list-check card-header-icon"></i> Items / Services</h2>
+        </div>
+        <div class="card-body">
+          <div class="items-header">
+            <span class="col-desc">Description</span>
+            <span class="col-qty">Qty</span>
+            <span class="col-rate">Rate</span>
+            <span class="col-amount">Amount</span>
+            <span class="col-actions"></span>
+          </div>
+          <div id="itemsList">
+            <div class="item-row">
+              <input type="text" class="item-description col-desc" value="Professional dental services" placeholder="Description">
+              <input type="number" class="item-qty col-qty" value="1" min="0">
+              <input type="number" class="item-rate col-rate" value="0" min="0" step="0.01">
+              <span class="item-amount col-amount">$0.00</span>
+              <button class="remove-item-btn" title="Remove item"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+          <button class="btn btn-primary-light" id="addItemBtn">
+            <i class="fas fa-plus"></i> Add item
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="far fa-note-sticky card-header-icon"></i> Notes &amp; Terms</h2>
+        </div>
+        <div class="card-body">
+          <div class="field-grid two-col">
+            <div class="field">
+              <label for="notes">Notes</label>
+              <textarea id="notes" placeholder="Thank you for choosing our practice..."></textarea>
+            </div>
+            <div class="field">
+              <label for="terms">Terms &amp; conditions</label>
+              <textarea id="terms">Payment is due within 30 days of invoice date.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ RIGHT: LIVE PREVIEW + SUMMARY ============ -->
+    <aside class="preview-column">
+
+      <div class="preview-sticky">
+
+        <div class="invoice-preview" id="invoicePreview">
+          <div class="preview-doc-header">
+            <div class="preview-from">
+              <img src="" id="previewLogo" class="preview-logo hidden" alt="">
+              <div class="preview-business-name" id="previewBusinessName">Your Business Name</div>
+              <div class="preview-business-meta" id="previewBusinessMeta"></div>
+            </div>
+            <div class="preview-invoice-meta">
+              <div class="preview-invoice-title">INVOICE</div>
+              <div class="preview-invoice-number" id="previewInvoiceNumber">#1001</div>
+            </div>
+          </div>
+
+          <div class="preview-divider"></div>
+
+          <div class="preview-parties">
+            <div>
+              <div class="preview-label">Bill To</div>
+              <div class="preview-value strong" id="previewBillTo">Client name</div>
+              <div class="preview-value muted" id="previewBillToAddress"></div>
+              <div class="preview-value muted" id="previewBillToEmail"></div>
+            </div>
+            <div class="preview-dates">
+              <div class="preview-date-row"><span class="preview-label">Invoice date</span><span class="preview-value" id="previewInvoiceDate">—</span></div>
+              <div class="preview-date-row"><span class="preview-label">Due date</span><span class="preview-value" id="previewDueDate">—</span></div>
+              <div class="preview-date-row" id="previewTermsRow"><span class="preview-label">Terms</span><span class="preview-value" id="previewPaymentTerms">—</span></div>
+              <div class="preview-date-row" id="previewPoRow"><span class="preview-label">PO #</span><span class="preview-value" id="previewPoNumber">—</span></div>
+            </div>
+          </div>
+
+          <table class="preview-items-table">
+            <thead>
+              <tr>
+                <th class="col-desc">Description</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-rate">Rate</th>
+                <th class="col-amount">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="previewItemsBody"></tbody>
+          </table>
+
+          <div class="preview-totals">
+            <div class="preview-total-row">
+              <span>Subtotal</span>
+              <span id="previewSubtotal">$0.00</span>
+            </div>
+            <div class="preview-total-row" id="previewDiscountRow">
+              <span id="previewDiscountLabel">Discount</span>
+              <span id="previewDiscountAmount">-$0.00</span>
+            </div>
+            <div class="preview-total-row">
+              <span id="previewVatLabel">VAT (0%)</span>
+              <span id="previewVatAmount">$0.00</span>
+            </div>
+            <div class="preview-total-row preview-total-final">
+              <span>Total</span>
+              <span id="previewTotal">$0.00</span>
+            </div>
+            <div class="preview-balance-row">
+              <span>Balance Due</span>
+              <span id="previewBalanceDue">$0.00</span>
+            </div>
+          </div>
+
+          <div class="preview-notes" id="previewNotesBlock">
+            <div class="preview-label">Notes</div>
+            <div class="preview-value muted" id="previewNotes"></div>
+          </div>
+          <div class="preview-notes" id="previewTermsBlock">
+            <div class="preview-label">Terms &amp; Conditions</div>
+            <div class="preview-value muted" id="previewTermsText"></div>
+          </div>
+        </div>
+
+        <div class="card summary-card">
+          <div class="card-header">
+            <h2><i class="fas fa-calculator card-header-icon"></i> Summary</h2>
+          </div>
+          <div class="card-body">
+            <div class="summary-row-input">
+              <label>Discount</label>
+              <select id="discountType">
+                <option value="percent">%</option>
+                <option value="value">Flat</option>
+              </select>
+              <input type="number" id="discountValue" value="0" min="0">
             </div>
 
-            <div class="form-cols">
-                <div class="form-col-left">
-                    <div class="logo-and-business">
-                        <label for="logoInput" class="add-logo-btn" id="logoLabel">
-                            <img src="" alt="Invoice Logo" id="logoPreview" class="logo-preview-img hidden">
-                            <div class="placeholder-icon" id="placeholderIcon">
-                                <i class="fas fa-plus"></i>
-                                <span>Add logo</span>
-                            </div>
-                        </label>
-                        <input type="file" id="logoInput" accept="image/*" style="display:none;">
-
-                        <div class="form-group-flex">
-                            <div class="input-container">
-                                <label for="businessName">Business Name *</label>
-                                <input type="text" id="businessName" placeholder="Your Company">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="invoice-details-grid">
-                        <div class="form-group">
-                            <label for="template">Template</label>
-                            <select id="template">
-                                <option value="classic">Classic</option>
-                            </select>
-                        </div>
-                        <div class="form-group currency-group">
-                            <label for="currency">Currency</label>
-                            <div class="currency-selector">
-                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USD Flag" class="flag-icon" id="currentCurrencyFlag">
-                                <select id="currency">
-                                    <option value="USD" selected data-symbol="$" data-flag="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg">USD - US Dollar ($)</option>
-                                    <option value="EUR" data-symbol="€" data-flag="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg">EUR - Euro (€)</option>
-                                    <option value="PKR" data-symbol="Rs" data-flag="https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Pakistan.svg">PKR - Pakistani Rupee (Rs)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group invoice-num-group">
-                            <label>INVOICE</label>
-                            <input type="text" value="1" id="invoiceNumber">
-                        </div>
-                    </div>
-
-                    <div class="billing-grid">
-                        <div class="form-group">
-                            <label for="billTo">Bill To (Client)</label>
-                            <input type="text" id="billTo" placeholder="Client Name">
-                            <textarea id="billToAddress" placeholder="Client address"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="dates-grid">
-                        <div class="form-group">
-                            <label for="invoiceDate">Invoice Date *</label>
-                            <input type="date" id="invoiceDate" value="2026-03-05">
-                        </div>
-                        <div class="form-group">
-                            <label for="dueDate">Due Date</label>
-                            <input type="date" id="dueDate" value="2026-04-04">
-                        </div>
-                        <div class="form-group">
-                            <label for="paymentTerms">Payment Terms (optional)</label>
-                            <input type="text" id="paymentTerms" placeholder="Net 30">
-                        </div>
-                        <div class="form-group">
-                            <label for="poNumber">PO Number</label>
-                            <input type="text" id="poNumber" placeholder="Optional">
-                        </div>
-                    </div>
-                </div>
+            <div class="summary-row-input">
+              <label>Tax / VAT</label>
+              <div class="vat-input-group">
+                <input type="number" id="vatValue" value="0" min="0">
+                <span class="percent-symbol">%</span>
+              </div>
             </div>
 
-            <section class="items-services-section">
-                <h2>Items / Services</h2>
-                <div class="items-header">
-                    <span class="col-desc">Description</span>
-                    <span class="col-qty">Qty</span>
-                    <span class="col-rate">Rate</span>
-                    <span class="col-amount">Amount</span>
-                    <span class="col-actions"></span>
-                </div>
-                <div id="itemsList">
-                    <div class="item-row">
-                        <input type="text" class="item-description col-desc" value="Professional services" placeholder="Description">
-                        <input type="number" class="item-qty col-qty" value="0">
-                        <input type="number" class="item-rate col-rate" value="0">
-                        <span class="item-amount col-amount">$0.00</span>
-                        <button class="remove-item-btn"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-                <button class="btn btn-primary-light" id="addItemBtn">
-                    <i class="fas fa-plus"></i> Add item
-                </button>
-            </section>
+            <div class="summary-totals">
+              <div class="total-row">
+                <span class="label">Subtotal</span>
+                <span class="value" id="subtotalDisplay">$0.00</span>
+              </div>
+              <div class="total-row">
+                <span class="label" id="vatLabel">VAT (0%)</span>
+                <span class="value" id="vatAmountDisplay">$0.00</span>
+              </div>
+              <div class="total-row total-final">
+                <span class="label">Total</span>
+                <span class="value" id="totalDisplay">$0.00</span>
+              </div>
+            </div>
 
-            <section class="notes-section">
-                <div class="notes-container">
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" placeholder="Additional notes..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="terms">Terms & Conditions</label>
-                        <textarea id="terms">Payment is due within 30 days of invoice date.</textarea>
-                    </div>
-                </div>
+            <div class="balance-due-section">
+              <span class="label">Balance Due</span>
+              <span class="value" id="balanceDueDisplay">$0.00</span>
+            </div>
+          </div>
+        </div>
 
-                <div class="summary-section">
-                    <h3>Summary</h3>
-                    <div class="summary-grid">
-                        <div class="summary-row-input">
-                            <label>Discount</label>
-                            <select id="discountType">
-                                <option value="percent">%</option>
-                                <option value="value">Rs</option> </select>
-                            <input type="number" id="discountValue" value="0">
-                        </div>
-                        <a href="#" class="summary-action-link">Add Discount</a>
+      </div>
+    </aside>
 
-                        <div class="summary-row-input">
-                            <label>VAT</label>
-                            <div class="vat-input-group">
-                                <input type="number" id="vatValue" value="0">
-                                <span class="percent-symbol">%</span>
-                            </div>
-                        </div>
-                        <a href="#" class="summary-action-link">Add Tax</a>
+  </div>
+</main>
 
-                        <div class="shipping-section-toggle">
-                            <i class="fas fa-chevron-right"></i> Shipping & amount paid
-                        </div>
-                    </div>
+<div class="toast" id="toast"></div>
 
-                    <div class="summary-totals">
-                        <div class="total-row">
-                            <span class="label">Subtotal</span>
-                            <span class="value" id="subtotalDisplay">$0.00</span>
-                        </div>
-                        <div class="total-row">
-                            <span class="label" id="vatLabel">VAT (0%)</span>
-                            <span class="value" id="vatAmountDisplay">$0.00</span>
-                        </div>
-                        <div class="total-row total-final">
-                            <span class="label">Total</span>
-                            <span class="value" id="totalDisplay">$0.00</span>
-                        </div>
-                    </div>
-
-                    <div class="balance-due-section">
-                        <span class="label">Balance Due</span>
-                        <span class="value" id="balanceDueDisplay">$0.00</span>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary-outline" id="previewBtn">
-                            <i class="far fa-eye"></i> Preview
-                        </button>
-                        <button class="btn btn-primary" id="downloadBtn">
-                            <i class="far fa-file-pdf"></i> Download
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-        </section>
-    </main>
-
-    <script src="scripts.js"></script>
+<script src="scripts.js"></script>
 </body>
 </html>
